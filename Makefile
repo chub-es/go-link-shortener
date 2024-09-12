@@ -1,4 +1,5 @@
 include .env
+export
 
 .PHONY: clear
 clear: ## Clear the working area and the project
@@ -10,7 +11,8 @@ fmt: ## Format code
 
 .PHONY: run
 run: ## Run app
-	go run ./cmd/app/
+	go mod tidy && go mod download && \
+	GIN_MODE=debug CGO_ENABLED=0 go run -tags migrate ./cmd/app
 
 .PHONY: compose-up
 compose-up: ### Run docker-compose
@@ -19,6 +21,10 @@ compose-up: ### Run docker-compose
 .PHONY: compose-down
 compose-down: ### Down docker-compose
 	docker-compose down --remove-orphans
+
+.PHONY: docker-rm-volume
+docker-rm-volume: ### remove docker volume
+	docker volume rm go-link-shortener_pg-data
 
 migrate-create:  ### create new migration
 	migrate create -ext sql -dir migrations $(name)
