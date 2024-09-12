@@ -19,6 +19,8 @@ services:
       - ${HTTP_PORT}:8080
     depends_on:
       - postgres
+    env_file:
+      - .env
 
 volumes:
   pg-data: 
