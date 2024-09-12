@@ -28,6 +28,13 @@ func WriteTimeout(timeout time.Duration) Option {
 	}
 }
 
+// MaxHeaderBytes -.
+func MaxHeaderBytes(bytes int) Option {
+	return func(s *Server) {
+		s.server.MaxHeaderBytes = bytes
+	}
+}
+
 // ShutdownTimeout -.
 func ShutdownTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
