@@ -16,7 +16,7 @@ services:
       context: .
       target: final
     ports:
-      - ${HTTP_PORT}:8080
+      - ${HTTP_PORT}:${HTTP_PORT}
     depends_on:
       - postgres
     env_file:

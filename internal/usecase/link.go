@@ -32,16 +32,16 @@ func (uc *LinkUseCase) GetURL(c context.Context, shortURL string) (string, error
 }
 
 // Create -.
-func (uc *LinkUseCase) Create(c context.Context, l entity.Link) (entity.Link, error) {
-	ID, err := uc.repo.Insert(c, l)
+func (uc *LinkUseCase) Create(c context.Context, l entity.Link) (string, error) {
+	shortURL, err := uc.repo.Insert(c, l)
 	if err != nil {
-		return entity.Link{}, err
+		return "", err
 	}
 
-	link, err := uc.repo.FindOne(c, "id", ID)
-	if err != nil {
-		return entity.Link{}, err
-	}
+	// link, err := uc.repo.FindOne(c, "id = ?", ID)
+	// if err != nil {
+	// 	return entity.Link{}, err
+	// }
 
-	return link, nil
+	return shortURL, nil
 }

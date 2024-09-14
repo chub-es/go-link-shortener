@@ -51,7 +51,7 @@ func (r *linkRoutes) doCreate(c *gin.Context) {
 		return
 	}
 
-	link, err := r.uc.Create(
+	shortURL, err := r.uc.Create(
 		c.Request.Context(),
 		entity.Link{
 			OriginalURL: request.OriginalURL,
@@ -64,5 +64,5 @@ func (r *linkRoutes) doCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"short_url": link.ShortURL})
+	c.JSON(http.StatusOK, gin.H{"short_url": shortURL})
 }

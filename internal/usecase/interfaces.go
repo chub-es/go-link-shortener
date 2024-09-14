@@ -9,11 +9,11 @@ import (
 type (
 	Link interface {
 		GetURL(c context.Context, shortURL string) (string, error)
-		Create(c context.Context, l entity.Link) (entity.Link, error)
+		Create(c context.Context, l entity.Link) (string, error)
 	}
 
 	LinkRepo interface {
-		Insert(c context.Context, link entity.Link) (int, error)
-		FindOne(c context.Context, columns string, args interface{}) (entity.Link, error)
+		Insert(c context.Context, link entity.Link) (string, error)
+		FindOne(c context.Context, columns string, args ...interface{}) (entity.Link, error)
 	}
 )
