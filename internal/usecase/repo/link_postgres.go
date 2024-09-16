@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/chub-es/go-link-shortener/internal/entity"
 	"github.com/chub-es/go-link-shortener/pkg/postgres"
 )
@@ -41,9 +42,10 @@ func (r *LinkRepo) Insert(c context.Context, link entity.Link) (string, error) {
 
 func (r *LinkRepo) FindOne(c context.Context, columns string, args ...interface{}) (entity.Link, error) {
 	sql, _, err := r.Builder.
-		Select("created_at, original_url, short_url").
+		Select("*").
 		From("links").
 		Where(columns).
+		OrderBy("created_at DESC").
 		Limit(1).
 		ToSql()
 	if err != nil {
@@ -58,10 +60,28 @@ func (r *LinkRepo) FindOne(c context.Context, columns string, args ...interface{
 
 	var link entity.Link
 	if rows.Next() {
-		if err = rows.Scan(&link.CreatedAt, &link.OriginalURL, &link.ShortURL); err != nil {
+		if err = rows.Scan(&link.ID, &link.CreatedAt, &link.OriginalURL, &link.ShortURL, &link.Showned); err != nil {
 			return entity.Link{}, fmt.Errorf("LinkRepo - FindOne - rows.Scan: %w", err)
 		}
 	}
 
 	return link, nil
+}
+
+func (r *LinkRepo) SetShowned(c context.Context, linkID int64) error {
+	sql, args, err := r.Builder.
+		Update("links").
+		Set("showned", squirrel.Expr("showned + 1")).
+		Where(squirrel.Eq{"id": linkID}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LinkRepo - SetShowned - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Query(c, sql, args...)
+	if err != nil {
+		return fmt.Errorf("LinkRepo - SetShowned - r.Pool.Query: %w", err)
+	}
+
+	return nil
 }

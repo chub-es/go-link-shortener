@@ -38,12 +38,12 @@ func (r *linkRoutes) doRedirect(c *gin.Context) {
 	c.Redirect(http.StatusMovedPermanently, originalURL)
 }
 
-type createShortUrlRequest struct {
+type createRequest struct {
 	OriginalURL string `json:"original_url" binding:"required"`
 }
 
 func (r *linkRoutes) doCreate(c *gin.Context) {
-	var request createShortUrlRequest
+	var request createRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.log.Error(err, "http - v1 - doCreateShortUrl")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})

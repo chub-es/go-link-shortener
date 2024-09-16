@@ -26,13 +26,13 @@ compose-down: ### Down docker-compose
 docker-rm-volume: ### remove docker volume
 	docker volume rm go-link-shortener_pg-data
 
+.PHONY: migrate-create
 migrate-create:  ### create new migration
 	migrate create -ext sql -dir migrations $(name)
-.PHONY: migrate-create
 
+.PHONY: migrate-up
 migrate-up: ### migration up
 	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
-.PHONY: migrate-up
 
 .PHONY: help
 .DEFAULT_GOAL := help

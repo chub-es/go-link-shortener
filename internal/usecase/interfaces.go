@@ -15,5 +15,6 @@ type (
 	LinkRepo interface {
 		Insert(c context.Context, link entity.Link) (string, error)
 		FindOne(c context.Context, columns string, args ...interface{}) (entity.Link, error)
+		SetShowned(c context.Context, linkID int64) error
 	}
 )

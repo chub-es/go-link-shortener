@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"github.com/chub-es/go-link-shortener/internal/entity"
 )
@@ -23,10 +22,7 @@ func (uc *LinkUseCase) GetURL(c context.Context, shortURL string) (string, error
 	if err != nil {
 		return "", err
 	}
-
-	if link.OriginalURL == "" {
-		return "", errors.New("unknown link")
-	}
+	_ = uc.repo.SetShowned(c, link.ID)
 
 	return link.OriginalURL, nil
 }
@@ -37,11 +33,6 @@ func (uc *LinkUseCase) Create(c context.Context, l entity.Link) (string, error) 
 	if err != nil {
 		return "", err
 	}
-
-	// link, err := uc.repo.FindOne(c, "id = ?", ID)
-	// if err != nil {
-	// 	return entity.Link{}, err
-	// }
 
 	return shortURL, nil
 }
