@@ -22,44 +22,44 @@ func newLinkRoutes(handler *gin.Engine, log logger.Interface, link usecase.Link)
 	// Api route
 	api := handler.Group("/api/v1")
 	{
-		api.POST("/url", l.doCreate)
+		api.POST("/url", l.doCreateLink)
 	}
 }
 
 func (r *linkRoutes) doRedirect(c *gin.Context) {
-	originalURL, err := r.uc.GetURL(c.Request.Context(), c.Param("short_url"))
+	link, err := r.uc.SearchLink(c.Request.Context(), c.Param("short_url"))
 	if err != nil {
-		r.log.Error(err, "http - v1 - doRedirect - r.uc.GetURL")
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "unknown link"})
+		r.log.Error(err, "http - v1 - doRedirect - r.uc.SearchLink")
+		c.AbortWithStatus(http.StatusNotFound)
 
 		return
 	}
 
-	c.Redirect(http.StatusMovedPermanently, originalURL)
+	c.Redirect(http.StatusMovedPermanently, link.OriginalURL)
 }
 
 type createRequest struct {
 	OriginalURL string `json:"original_url" binding:"required"`
 }
 
-func (r *linkRoutes) doCreate(c *gin.Context) {
+func (r *linkRoutes) doCreateLink(c *gin.Context) {
 	var request createRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		r.log.Error(err, "http - v1 - doCreateShortUrl")
+		r.log.Error(err, "http - v1 - doCreateLink")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 
 		return
 	}
 
-	shortURL, err := r.uc.Create(
+	shortURL, err := r.uc.CreateLink(
 		c.Request.Context(),
 		entity.Link{
 			OriginalURL: request.OriginalURL,
 		},
 	)
 	if err != nil {
-		r.log.Error(err, "http - v1 - doCreateShortUrl - r.uc.Create")
-		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})
+		r.log.Error(err, "http - v1 - doCreateLink - r.uc.CreateLink")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "error creating link"})
 
 		return
 	}

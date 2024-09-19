@@ -27,27 +27,6 @@ func Run(cfg *config.Config) {
 	defer pg.Close()
 	l.Info("Postgres successfully connected")
 
-	// sql, args, _ := pg.Builder.
-	// 	Select("*").
-	// 	From("links").
-	// 	Where("short_url = ?", "Fx2F2O").
-	// 	OrderBy("created_at DESC").
-	// 	Limit(1).
-	// 	ToSql()
-	// rows, _ := pg.Pool.Query(context.TODO(), sql, args...)
-	// var link entity.Link
-	// if rows.Next() {
-	// 	rows.Scan(&link.ID, &link.CreatedAt, &link.OriginalURL, &link.ShortURL, &link.Showned)
-	// }
-
-	// sql, args, _ = pg.Builder.
-	// 	Update("links").
-	// 	Set("showned", squirrel.Expr("showned + 1")).
-	// 	Where(squirrel.Eq{"id": link.ID}).
-	// 	ToSql()
-	// _, _ = pg.Pool.Query(context.TODO(), sql, args...)
-	// log.Fatal("stop")
-
 	// Init Usecases
 	linkUsecase := usecase.New(repo.New(pg))
 

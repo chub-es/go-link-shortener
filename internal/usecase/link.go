@@ -16,19 +16,19 @@ func New(r LinkRepo) *LinkUseCase {
 	return &LinkUseCase{r}
 }
 
-// GetURL -.
-func (uc *LinkUseCase) GetURL(c context.Context, shortURL string) (string, error) {
+// SearchLink -.
+func (uc *LinkUseCase) SearchLink(c context.Context, shortURL string) (entity.Link, error) {
 	link, err := uc.repo.FindOne(c, "short_url = ?", shortURL)
 	if err != nil {
-		return "", err
+		return entity.Link{}, err
 	}
-	_ = uc.repo.SetShowned(c, link.ID)
+	_ = uc.repo.UpShowned(c, link.ID)
 
-	return link.OriginalURL, nil
+	return link, nil
 }
 
 // Create -.
-func (uc *LinkUseCase) Create(c context.Context, l entity.Link) (string, error) {
+func (uc *LinkUseCase) CreateLink(c context.Context, l entity.Link) (string, error) {
 	shortURL, err := uc.repo.Insert(c, l)
 	if err != nil {
 		return "", err
