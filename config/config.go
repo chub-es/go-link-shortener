@@ -10,8 +10,14 @@ import (
 type (
 	// Config -.
 	Config struct {
+		App `mapstructure:",squash"`
 		HTTP `mapstructure:",squash"`
 		PG   `mapstructure:",squash"`
+	}
+
+	// APP -.
+	App struct {
+		TimeZone string `mapstructure:"TIME_ZONE"`
 	}
 
 	// HTTP -.

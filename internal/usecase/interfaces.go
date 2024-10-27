@@ -6,6 +6,8 @@ import (
 	"github.com/chub-es/go-link-shortener/internal/entity"
 )
 
+//go:generate mockgen -source=interfaces.go -destination=./mocks_test.go -package=usecase_test
+
 type (
 	Link interface {
 		SearchLink(c context.Context, shortURL string) (entity.Link, error)
