@@ -35,7 +35,7 @@ func Run(cfg *config.Config) {
 	v1.NewRouter(handler, l, linkUsecase)
 	server := httpserver.New(
 		handler,
-		httpserver.Port("8080"),
+		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(cfg.HTTP.ReadTimeout),
 		httpserver.WriteTimeout(cfg.HTTP.WriteTimeout),
 		httpserver.MaxHeaderBytes(cfg.HTTP.MaxHeaderBytes),

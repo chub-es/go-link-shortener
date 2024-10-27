@@ -10,8 +10,14 @@ import (
 type (
 	// Config -.
 	Config struct {
+		App `mapstructure:",squash"`
 		HTTP `mapstructure:",squash"`
 		PG   `mapstructure:",squash"`
+	}
+
+	// APP -.
+	App struct {
+		TimeZone string `mapstructure:"TIME_ZONE"`
 	}
 
 	// HTTP -.
@@ -42,7 +48,6 @@ func Load() (*Config, error) {
 
 	// Set defaults
 	viper.SetDefault("GIN_MODE", "debug")
-	// viper.SetDefault("HTTP_PORT", "8080")
 	viper.SetDefault("HTTP_READ_TIMEOUT", "10s")
 	viper.SetDefault("HTTP_WRITE_TIMEOUT", "10s")
 	viper.SetDefault("HTTP_MAX_HEADER_BYTES", "1")

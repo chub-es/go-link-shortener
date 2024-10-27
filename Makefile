@@ -18,6 +18,10 @@ run: ## Run app
 compose-up: ### Run docker-compose
 	docker-compose --env-file ./.env up --build -d
 
+compose-up-integration-test: ### Run docker-compose with integration test
+	docker-compose up --build --abort-on-container-exit --exit-code-from integration
+.PHONY: compose-up-integration-test
+
 .PHONY: compose-down
 compose-down: ### Down docker-compose
 	docker-compose down --remove-orphans
@@ -26,13 +30,25 @@ compose-down: ### Down docker-compose
 docker-rm-volume: ### remove docker volume
 	docker volume rm go-link-shortener_pg-data
 
+test: ### run test
+	CGO_ENABLED=1 go test -v -cover -race ./internal/...
+.PHONY: test
+
+integration-test: ### run integration-test
+	go clean -testcache && go test -v ./integration-test/...
+.PHONY: integration-test
+
+mock: ### run mockgen
+	mockgen -source ./internal/usecase/interfaces.go -package usecase_test > ./internal/usecase/mocks_test.go
+.PHONY: mock
+
+.PHONY: migrate-create
 migrate-create:  ### create new migration
 	migrate create -ext sql -dir migrations $(name)
-.PHONY: migrate-create
 
+.PHONY: migrate-up
 migrate-up: ### migration up
 	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
-.PHONY: migrate-up
 
 .PHONY: help
 .DEFAULT_GOAL := help
