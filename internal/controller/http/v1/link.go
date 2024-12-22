@@ -22,15 +22,40 @@ func newLinkRoutes(handler *gin.Engine, log logger.Interface, link usecase.Link)
 	// Api route
 	api := handler.Group("/api/v1")
 	{
-		api.POST("/url", l.doCreateLink)
+		api.POST("/url/create", l.doCreateLink)
 	}
 }
 
 func (r *linkRoutes) doRedirect(c *gin.Context) {
-	link, err := r.uc.SearchLink(c.Request.Context(), c.Param("short_url"))
+	shortURL := c.Param("short_url")
+	if shortURL == "" {
+		c.AbortWithStatus(http.StatusBadRequest)
+
+		return
+	}
+
+	link, err := r.uc.SearchLink(
+		c.Request.Context(),
+		entity.Link{
+			ShortURL: shortURL,
+		},
+	)
 	if err != nil {
 		r.log.Error(err, "http - v1 - doRedirect - r.uc.SearchLink")
 		c.AbortWithStatus(http.StatusNotFound)
+
+		return
+	}
+	if link.IsEmpty() {
+		c.AbortWithStatus(http.StatusNotFound)
+
+		return
+	}
+
+	err = r.uc.UpShownLink(c, link)
+	if err != nil {
+		r.log.Error(err, "http - v1 - doRedirect - r.uc.UpShownLink")
+		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return
 	}

@@ -21,7 +21,7 @@ type test struct {
 	err  error
 }
 
-func link(t *testing.T) (*usecase.LinkUseCase, *MockLinkRepo) {
+func link(t *testing.T) (*usecase.LinkUsecase, *MockLinkRepo) {
 	t.Helper()
 
 	mockCtl := gomock.NewController(t)
@@ -40,10 +40,17 @@ func TestSearchLink(t *testing.T) {
 
 	tests := []test{
 		{
-			name: "search link repo error",
+			name: "empty result",
 			mock: func() {
-				repo.EXPECT().FindOne(context.TODO(), "short_url = ?", "value").Return(entity.Link{}, errInternalServErr)
-				repo.EXPECT().UpShowned(context.TODO(), 1).Return(errInternalServErr)
+				repo.EXPECT().FindOne(context.TODO(), "short_url = ?", "shortURL").Return(entity.Link{}, nil)
+			},
+			res: entity.Link{},
+			err: nil,
+		},
+		{
+			name: "result with error",
+			mock: func() {
+				repo.EXPECT().FindOne(context.TODO(), "short_url = ?", "shortURL").Return(entity.Link{}, errInternalServErr)
 			},
 			res: entity.Link{},
 			err: errInternalServErr,
@@ -58,7 +65,7 @@ func TestSearchLink(t *testing.T) {
 
 			tc.mock()
 
-			res, err := link.SearchLink(context.TODO(), "value")
+			res, err := link.SearchLink(context.TODO(), entity.Link{ShortURL: "shortURL"})
 
 			require.EqualValues(t, res, tc.res)
 			require.ErrorIs(t, err, tc.err)
@@ -73,7 +80,7 @@ func TestCreateLink(t *testing.T) {
 
 	tests := []test{
 		{
-			name: "create link repo error",
+			name: "result with error",
 			mock: func() {
 				repo.EXPECT().Insert(context.TODO(), entity.Link{}).Return("", errInternalServErr)
 			},
@@ -93,6 +100,38 @@ func TestCreateLink(t *testing.T) {
 			res, err := link.CreateLink(context.TODO(), entity.Link{})
 
 			require.EqualValues(t, res, tc.res)
+			require.ErrorIs(t, err, tc.err)
+		})
+	}
+}
+
+func TestUpShownedLink(t *testing.T) {
+	t.Parallel()
+
+	link, repo := link(t)
+
+	tests := []test{
+		{
+			name: "result with error",
+			mock: func() {
+				repo.EXPECT().UpShowned(context.TODO(), entity.Link{}).Return(errInternalServErr)
+			},
+			res: nil,
+			err: errInternalServErr,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			tc.mock()
+
+			err := link.UpShownLink(context.TODO(), entity.Link{})
+
+			require.EqualValues(t, nil, tc.res)
 			require.ErrorIs(t, err, tc.err)
 		})
 	}

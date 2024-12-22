@@ -10,13 +10,14 @@ import (
 
 type (
 	Link interface {
-		SearchLink(c context.Context, shortURL string) (entity.Link, error)
+		SearchLink(c context.Context, l entity.Link) (entity.Link, error)
 		CreateLink(c context.Context, l entity.Link) (string, error)
+		UpShownLink(c context.Context, l entity.Link) error
 	}
 
 	LinkRepo interface {
 		Insert(c context.Context, link entity.Link) (string, error)
 		FindOne(c context.Context, columns string, args ...interface{}) (entity.Link, error)
-		UpShowned(c context.Context, linkID int64) error
+		UpShowned(c context.Context, link entity.Link) error
 	}
 )

@@ -2,11 +2,13 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/chub-es/go-link-shortener/internal/entity"
 	"github.com/chub-es/go-link-shortener/pkg/postgres"
+	"github.com/jackc/pgx/v4"
 )
 
 // LinkRepo -.
@@ -53,18 +55,28 @@ func (r *LinkRepo) FindOne(c context.Context, columns string, args ...interface{
 
 	var link entity.Link
 	row := r.Pool.QueryRow(c, sql, args...)
-	if err = row.Scan(&link.ID, &link.CreatedAt, &link.OriginalURL, &link.ShortURL, &link.Showned); err != nil {
+	if err = row.Scan(
+		&link.ID,
+		&link.CreatedAt,
+		&link.OriginalURL,
+		&link.ShortURL,
+		&link.Showned,
+	); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return entity.Link{}, nil
+		}
+
 		return entity.Link{}, fmt.Errorf("LinkRepo - FindOne - row.Scan: %w", err)
 	}
 
 	return link, nil
 }
 
-func (r *LinkRepo) UpShowned(c context.Context, linkID int64) error {
+func (r *LinkRepo) UpShowned(c context.Context, l entity.Link) error {
 	sql, args, err := r.Builder.
 		Update("links").
 		Set("showned", squirrel.Expr("showned + 1")).
-		Where(squirrel.Eq{"id": linkID}).
+		Where(squirrel.Eq{"id": l.ID}).
 		ToSql()
 	if err != nil {
 		return fmt.Errorf("LinkRepo - UpShowned - r.Builder: %w", err)

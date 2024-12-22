@@ -47,14 +47,14 @@ func Run(cfg *config.Config) {
 	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	select {
 	case s := <-channel:
-		l.Info("app - Run - signal: " + s.String())
+		l.Info("app - Run - signal: %s", s.String())
 	case err := <-server.Notify():
-		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
+		l.Error("app - Run - httpServer.Notify: %w", err)
 	}
 
 	// Shutdown
 	err = server.Shutdown()
 	if err != nil {
-		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
+		l.Error("app - Run - httpServer.Shutdown: %w", err)
 	}
 }
