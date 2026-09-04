@@ -28,7 +28,8 @@ type Postgres struct {
 }
 
 // New -.
-func New(url string, opts ...Option) (*Postgres, error) {
+func New(user, password, host, port, db string, opts ...Option) (*Postgres, error) {
+	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, db)
 	pg := &Postgres{
 		maxPoolSize:  _defaultMaxPoolSize,
 		connAttempts: _defaultConnAttempts,

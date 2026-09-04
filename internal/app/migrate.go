@@ -4,6 +4,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -20,13 +21,32 @@ const (
 )
 
 func init() {
-	databaseURL, ok := os.LookupEnv("PG_URL")
+	user, ok := os.LookupEnv("PG_USER")
 	if !ok || len(databaseURL) == 0 {
-		log.Fatalf("migrate: environment variable not declared: PG_URL")
+		log.Fatalf("migrate: environment variable not declared: PG_USER")
 	}
 
-	databaseURL += "?sslmode=disable"
+	password, ok := os.LookupEnv("PG_PASSWORD")
+	if !ok || len(databaseURL) == 0 {
+		log.Fatalf("migrate: environment variable not declared: PG_PASSWORD")
+	}
 
+	host, ok := os.LookupEnv("PG_HOST")
+	if !ok || len(databaseURL) == 0 {
+		log.Fatalf("migrate: environment variable not declared: PG_HOST")
+	}
+
+	port, ok := os.LookupEnv("PG_PORT")
+	if !ok || len(databaseURL) == 0 {
+		log.Fatalf("migrate: environment variable not declared: PG_PORT")
+	}
+
+	db, ok := os.LookupEnv("PG_DB")
+	if !ok || len(databaseURL) == 0 {
+		log.Fatalf("migrate: environment variable not declared: PG_DB")
+	}
+
+	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, db)
 	var (
 		attempts = _defaultAttempts
 		err      error
