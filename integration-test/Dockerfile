@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.23.0
+ARG GO_VERSION=1.27.1
 
 # Step 1: Modules caching
 FROM golang:${GO_VERSION} as modules

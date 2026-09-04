@@ -10,7 +10,7 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App `mapstructure:",squash"`
+		App  `mapstructure:",squash"`
 		HTTP `mapstructure:",squash"`
 		PG   `mapstructure:",squash"`
 	}
@@ -31,8 +31,12 @@ type (
 
 	// PG -.
 	PG struct {
-		URL     string `mapstructure:"PG_URL" validate:"required"`
-		PoolMax int    `mapstructure:"PG_POOL_MAX"`
+		PoolMax  int    `mapstructure:"PG_POOL_MAX"`
+		DB       string `mapstructure:"PG_DB" validate:"required"`
+		User     string `mapstructure:"PG_USER" validate:"required"`
+		Password string `mapstructure:"PG_PASSWORD" validate:"required"`
+		Host     string `mapstructure:"PG_HOST" validate:"required"`
+		Port     string `mapstructure:"PG_PORT" validate:"required"`
 	}
 )
 

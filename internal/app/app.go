@@ -20,7 +20,7 @@ func Run(cfg *config.Config) {
 	l := logger.New(cfg.HTTP.Mode)
 
 	// Repostiry
-	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
+	pg, err := postgres.New(cfg.PG.User, cfg.PG.Password, cfg.PG.Host, cfg.PG.Port, cfg.PG.DB, postgres.MaxPoolSize(cfg.PG.PoolMax))
 	if err != nil {
 		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
 	}
@@ -47,14 +47,14 @@ func Run(cfg *config.Config) {
 	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	select {
 	case s := <-channel:
-		l.Info("app - Run - signal: " + s.String())
+		l.Info("app - Run - signal: %s", s.String())
 	case err := <-server.Notify():
-		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
+		l.Error("app - Run - httpServer.Notify: %w", err)
 	}
 
 	// Shutdown
 	err = server.Shutdown()
 	if err != nil {
-		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
+		l.Error("app - Run - httpServer.Shutdown: %w", err)
 	}
 }

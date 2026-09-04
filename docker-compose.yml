@@ -6,7 +6,7 @@ services:
       - pg-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: 'user'
-      POSTGRES_PASSWORD: 'pass'
+      POSTGRES_PASSWORD: /run/secrets/db_password
       POSTGRES_DB: 'linkShortener'
     ports:
       - 5432:5432
@@ -32,4 +32,8 @@ services:
       - app
 
 volumes:
-  pg-data: 
+  pg-data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
